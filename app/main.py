@@ -1,6 +1,7 @@
 import time
 
 from app.monitor import verificar_url
+from app.database import salvar_verificacao
 
 url = input("Digite a URL que deseja verificar: ")
 
@@ -13,6 +14,8 @@ while verificacoes < 5:
     resultado = verificar_url(url)
 
     historico.append(resultado)
+
+    salvar_verificacao(resultado)
 
     print(f"Status: {resultado['status']}")
     print(f"Código de status: {resultado['status_code']}")
