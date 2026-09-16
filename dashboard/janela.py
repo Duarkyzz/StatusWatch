@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, Q
 
 app = QApplication(sys.argv)
 
-class main_window(QWidget):
+class main_window(QMainWindow):
     def __init__(self):
 
         super().__init__()
@@ -34,15 +34,12 @@ class main_window(QWidget):
         login_layout.addWidget(self.input_senha)
         login_layout.addWidget(self.botao_login)
 
+        self.login.setLayout(login_layout)
+        self.pilha.addWidget(self.login)
+        self.setCentralWidget(self.pilha)
+
+
 
 janela = main_window()
 janela.show()
 app.exec()
-
-
-
-
-        
-
-
-
