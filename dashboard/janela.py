@@ -1,28 +1,48 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QVBoxLayout, QLabel, QLineEdit
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QVBoxLayout, QLabel, QLineEdit, QStackedWidget
 
 app = QApplication(sys.argv)
 
-janela = QWidget()
-janela.setWindowTitle("StatusWatch")
-janela.resize(800, 700)
+class main_window(QWidget):
+    def __init__(self):
 
-layoyut = QVBoxLayout()
+        super().__init__()
 
-titulo = QLabel("StatusWatch")
-titulo.setStyleSheet("font-size: 24px; font-weight: bold;")
+        # Criar a pilha de widgets
+        self.pilha = QStackedWidget()
 
-campo_url = QLineEdit()
-campo_url.setPlaceholderText("Digite a URL do site")
+        # Criar os widgets de login e dashboard
+        self.login = QWidget()
+        self.dashboard = QWidget()
 
-botao_verificar = QPushButton("Verificar Status")
+        # Configurar o layout do widget de login
 
-layoyut.addWidget(titulo)
-layoyut.addWidget(campo_url)
-layoyut.addWidget(botao_verificar)
+        login_layout = QVBoxLayout()
+        self.label_usuario = QLabel("Usuário:")
+        self.input_usuario = QLineEdit()
 
-janela.setLayout(layoyut)
+        self.label_senha = QLabel("Senha:")
+        self.input_senha = QLineEdit()
 
+        self.botao_login = QPushButton("Login")
+
+        # Adicionar os widgets ao layout de login
+
+        login_layout.addWidget(self.label_usuario)
+        login_layout.addWidget(self.input_usuario)
+        login_layout.addWidget(self.label_senha)
+        login_layout.addWidget(self.input_senha)
+        login_layout.addWidget(self.botao_login)
+
+
+janela = main_window()
 janela.show()
-
 app.exec()
+
+
+
+
+        
+
+
+
