@@ -18,10 +18,15 @@ print("Tabela 'verificacoes' criada com sucesso!")
 
 def salvar_verificacao(resultado):
 
-    print("Salvando verificação no banco de dados...")
-    print(resultado)
-
     cursor.execute('''INSERT INTO verificacoes (url, status_code, status, response_time)
                       VALUES (?, ?, ?, ?)''',
                    (resultado['url'], resultado['status_code'], resultado['status'], resultado['response_time']))
     conection.commit()
+
+def buscar_historico():
+
+    cursor.execute('''SELECT * FROM verificacoes''')
+
+    resultados = cursor.fetchall()
+
+    return resultados
