@@ -26,6 +26,10 @@ class main_window(QMainWindow):
 
         self.botao_login = QPushButton("Login")
 
+        # Conectar o sinal clicked na função
+
+        self.botao_login.clicked.connect(self.botao_clicado)
+
         # Adicionar os widgets ao layout de login
 
         login_layout.addWidget(self.label_usuario)
@@ -38,6 +42,23 @@ class main_window(QMainWindow):
         self.pilha.addWidget(self.login)
         self.setCentralWidget(self.pilha)
 
+        # Configurar o layout de widget do dashboard
+
+        dashboard_layout = QVBoxLayout()
+        self.dashboard_label = QLabel("Dashboard do StatusWatch")
+
+        dashboard_layout.addWidget(self.dashboard_label)
+
+        self.dashboard.setLayout(dashboard_layout)
+        self.pilha.addWidget(self.dashboard)
+
+        # Função do botão
+
+    def botao_clicado(self):
+        usuario = self.input_usuario.text()
+        print(usuario)
+        senha = self.input_senha.text()
+        print(senha)
 
 
 janela = main_window()
