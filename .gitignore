@@ -1,6 +1,6 @@
 __pycache__/
 *.pyc
-statuswatch.db
+status_watch.db
 .env
 .venv/
 venv/
