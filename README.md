@@ -1,65 +1,57 @@
 # StatusWatch 🔎
 
-Monitor de sites e APIs desenvolvido em Python.
+Monitor de sites e APIs desenvolvido em **Python**, com armazenamento em **PostgreSQL** e interface desktop em desenvolvimento.
 
-O **StatusWatch** é uma aplicação desenvolvida para monitorar URLs, verificar o status de respostas HTTP, medir o tempo de resposta e armazenar o histórico das verificações.
+O **StatusWatch** monitora URLs, verifica respostas HTTP, mede o tempo de resposta e mantém um histórico das verificações.
 
-O projeto está sendo desenvolvido de forma progressiva, começando pelo monitoramento via terminal e evoluindo para uma aplicação desktop completa.
+O projeto começou como uma aplicação via terminal e está evoluindo para uma aplicação desktop com autenticação, monitoramento e histórico integrado.
 
 ---
 
 ## ✨ Funcionalidades
 
-- 🌐 Monitoramento de URLs
+- 🌐 Monitoramento de sites e APIs
 - 📡 Verificação de status HTTP
 - ⏱️ Medição do tempo de resposta
-- 🔄 Múltiplas verificações
 - 🛡️ Tratamento de erros e timeout
-- 🗄️ Armazenamento das verificações em banco de dados
-- 📋 Consulta do histórico de verificações
+- 🔄 Múltiplas verificações
+- 🗄️ Histórico de verificações em PostgreSQL
+- 👤 Cadastro e autenticação de usuários
+- 🖥️ Interface desktop com PySide6 em desenvolvimento
 
 ---
 
 ## 🛠️ Tecnologias
 
-### Atualmente
-
-- 🐍 Python
-- 🌐 Requests
-- 🗄️ SQLite
-
-### Em desenvolvimento
-
-- 🖥️ PySide6 — Interface gráfica
-- ⚡ FastAPI — API
-- 🧵 Threads / Async — Monitoramento em paralelo
-
-### Futuro
-
-- 🐘 PostgreSQL
-- 🔔 Sistema de notificações
-- 📦 PyInstaller — Aplicação executável
-- 👤 Sistema de usuários
+- 🐍 **Python**
+- 🌐 **Requests**
+- 🖥️ **PySide6**
+- 🐘 **PostgreSQL**
+- ☁️ **Supabase**
+- 🔐 **python-dotenv**
+- 🔌 **psycopg2**
 
 ---
 
 ## 🔄 Como funciona
 
-O fluxo principal do StatusWatch atualmente funciona da seguinte forma:
+```text
+Usuário informa uma URL
+        ↓
+StatusWatch realiza uma requisição HTTP
+        ↓
+Analisa o status da resposta
+        ↓
+Calcula o tempo de resposta
+        ↓
+Trata erros e timeouts
+        ↓
+Salva a verificação no PostgreSQL
+        ↓
+Histórico disponível para consulta
+```
 
-    Usuário informa uma URL
-            ↓
-    StatusWatch realiza uma requisição HTTP
-            ↓
-    Analisa o status da resposta
-            ↓
-    Calcula o tempo de resposta
-            ↓
-    Trata possíveis erros e timeouts
-            ↓
-    Salva a verificação no SQLite
-            ↓
-    Permite consultar o histórico
+A aplicação utiliza um banco **PostgreSQL hospedado no Supabase**. As credenciais de conexão são mantidas localmente através de variáveis de ambiente e não fazem parte do repositório.
 
 ---
 
@@ -67,54 +59,72 @@ O fluxo principal do StatusWatch atualmente funciona da seguinte forma:
 
 ### ✅ Concluído
 
-- [x] Receber URL do usuário
-- [x] Realizar requisições HTTP
-- [x] Verificar status da resposta
-- [x] Medir tempo de resposta
-- [x] Realizar múltiplas verificações
-- [x] Tratar erros de conexão
-- [x] Implementar timeout
-- [x] Criar banco de dados SQLite
-- [x] Registrar verificações
-- [x] Consultar histórico
+- [x] Monitoramento de URLs
+- [x] Requisições HTTP
+- [x] Status HTTP
+- [x] Tempo de resposta
+- [x] Tratamento de erros e timeout
+- [x] Histórico de verificações
+- [x] Migração de SQLite para PostgreSQL
+- [x] Banco PostgreSQL hospedado no Supabase
+- [x] Estrutura inicial de usuários
+- [x] Cadastro e validação no banco
+- [x] Estrutura inicial da interface com PySide6
 
 ### 🔨 Em desenvolvimento
 
-- [ ] Separar melhor as responsabilidades do projeto
-- [ ] Cadastro de múltiplas URLs
+- [ ] Integrar cadastro à interface
+- [ ] Integrar login à interface
+- [ ] Finalizar navegação entre Login, Cadastro e Dashboard
+- [ ] Aplicar interface dark e minimalista
+- [ ] Exibir histórico no Dashboard
+- [ ] Cadastro e gerenciamento de múltiplas URLs
+
+### 🔮 Próximos passos
+
 - [ ] Monitoramento automático
-- [ ] Interface gráfica com PySide6
-- [ ] Exibição do histórico na interface
+- [ ] Monitoramento simultâneo de múltiplas URLs
 - [ ] Gráficos de tempo de resposta
-
-### 🔮 Futuro
-
-- [ ] Monitoramento de várias URLs simultaneamente
-- [ ] Threads / Async
 - [ ] API com FastAPI
-- [ ] Sistema de usuários e autenticação
 - [ ] Sistema de notificações
-- [ ] Migração para PostgreSQL
-- [ ] Gerar aplicativo executável para Windows
+- [ ] Melhorias de segurança na autenticação
+- [ ] Gerar executável para Windows
 - [ ] Deploy
 
 ---
 
-## 🎯 Objetivo do projeto
+## 🔐 Segurança
 
-O StatusWatch está sendo desenvolvido como um projeto de estudo e portfólio, com o objetivo de aplicar conceitos de:
+As credenciais do PostgreSQL são armazenadas através de variáveis de ambiente.
+
+O repositório utiliza:
+
+```text
+.env          → credenciais locais (não versionado)
+.env.example  → exemplo de configuração
+.gitignore    → impede arquivos sensíveis e gerados de serem versionados
+```
+
+Nenhuma senha ou credencial do banco deve ser adicionada diretamente ao código.
+
+> A autenticação ainda está em desenvolvimento e não deve ser considerada pronta para uso em produção.
+
+---
+
+## 🎯 Objetivo
+
+O StatusWatch é um projeto de estudo e portfólio criado para aplicar conceitos de desenvolvimento backend na prática, incluindo:
 
 - Python
-- Programação orientada a objetos
 - Requisições HTTP
 - Tratamento de exceções
-- Banco de dados
-- Arquitetura de aplicações
-- APIs
+- PostgreSQL
+- Persistência de dados
+- Autenticação
 - Interfaces gráficas
-- Concorrência e monitoramento
+- Organização e evolução de aplicações
 
-A ideia é evoluir o projeto gradualmente, entendendo e implementando cada parte do sistema.
+O objetivo é transformar gradualmente um monitor simples de URLs em uma aplicação completa de monitoramento.
 
 ---
 

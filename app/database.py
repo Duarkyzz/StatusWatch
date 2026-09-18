@@ -1,70 +1,97 @@
-import sqlite3
+import os
 import hashlib
+import psycopg2
 
-conection = sqlite3.connect('status_watch.db')
+from dotenv import load_dotenv
 
+
+# Carrega as variáveis que estão no arquivo .env
+load_dotenv()
+
+# Pega a URL do PostgreSQL que colocamos no .env
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Cria a conexão com o PostgreSQL do Supabase
+conection = psycopg2.connect(DATABASE_URL)
+
+# Cursor usado para executar comandos SQL
 cursor = conection.cursor()
 
-# Tabela das verificações
 
-cursor.execute('''CREATE TABLE IF NOT EXISTS verificacoes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    url TEXT NOT NULL,
-    status_code INTEGER,
-    status TEXT NOT NULL,
-    response_time REAL NOT NULL
-)''')
+def cadastrar_usuario(email, senha):
 
-# Tabela das contas registradas
+    if not email or not senha:
+        return "Preencha os dados primeiro!"
 
-cursor.execute('''CREATE TABLE IF NOT EXISTS usuarios (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT NOT NULL UNIQUE,
-    senha_hash TEXT NOT NULL
-)''')
+    senha_hash = hashlib.sha256(senha.encode()).hexdigest()
 
-conection.commit()
+    try:
+        cursor.execute(
+            '''INSERT INTO usuarios (email, senha_hash)
+               VALUES (%s, %s)''',
+            (email, senha_hash)
+        )
+
+        conection.commit()
+
+        return "Cadastro criado com sucesso!"
+
+    except psycopg2.IntegrityError:
+
+        conection.rollback()
+
+        return "E-mail já cadastrado."
+
 
 def fazer_login(email_digitado, senha_digitada):
 
-    # 1. Busca o usuário apenas pelo e-mail (Seguro contra SQL Injection)
+    cursor.execute(
+        '''SELECT senha_hash
+           FROM usuarios
+           WHERE email = %s''',
+        (email_digitado,)
+    )
 
-    cursor.execute("SELECT senha_hash FROM usuarios WHERE email = ?", (email_digitado,))
     resultado = cursor.fetchone()
-
-    # 2. Se o e-mail não existir no banco
 
     if resultado is None:
         return "E-mail ou senha incorretos."
 
-    # 3. Transforma a senha digitada em HASH para comparação
+    senha_hash_digitada = hashlib.sha256(
+        senha_digitada.encode()
+    ).hexdigest()
 
-    senha_hash_digitada = hashlib.sha256(senha_digitada.encode()).hexdigest()
     senha_hash_banco = resultado[0]
 
     if senha_hash_digitada == senha_hash_banco:
-        return "Login efetuado com sucesso"
-    else:
-        return "E-mail ou senha incorretos."
+        return "Login realizado com sucesso!"
 
-def cadastrar_usuario(email, senha, cadastros):
+    return "E-mail ou senha incorretos."
 
-    senha_hash = hashlib.sha256(senha.encode()).hexdigest()
-    
-    cursor.execute ('''INSERT INTO cadastrar_usuario (email, senha)
-                      VALUES (?, ?)''',
-                   (cadastros["email"], cadastros["senha"]))
 
 def salvar_verificacao(resultado):
 
-    cursor.execute('''INSERT INTO verificacoes (url, status_code, status, response_time)
-                      VALUES (?, ?, ?, ?)''',
-                   (resultado['url'], resultado['status_code'], resultado['status'], resultado['response_time']))
+    cursor.execute(
+        '''INSERT INTO verificacoes
+           (url, status_code, status, response_time)
+           VALUES (%s, %s, %s, %s)''',
+        (
+            resultado["url"],
+            resultado["status_code"],
+            resultado["status"],
+            resultado["response_time"]
+        )
+    )
+
     conection.commit()
+
 
 def buscar_historico():
 
-    cursor.execute('''SELECT * FROM verificacoes''')
+    cursor.execute(
+        '''SELECT *
+           FROM verificacoes'''
+    )
 
     resultados = cursor.fetchall()
 
