@@ -21,6 +21,7 @@ class LoginPage(QWidget):
     def __init__(self):
         super().__init__()
 
+
         # Layout da tela
         layout = QVBoxLayout()
 
@@ -35,6 +36,7 @@ class LoginPage(QWidget):
         # Botões
         self.botao_login = QPushButton("Login")
         self.botao_cadastro = QPushButton("Cadastre-se")
+        layout.addWidget(self.botao_cadastro, alignment=Qt.AlimentFlag.AlingCenter)
 
         # Adicionando os elementos ao layout
         layout.addWidget(self.label_email_login)
@@ -119,6 +121,10 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+
+        self.setWindowTitle("StatusWatch")
+        self.resize(1200, 700)
+        self.setMinimumSize(1000, 600)
 
         # Pilha responsável por guardar as páginas
         self.pilha = QStackedWidget()
