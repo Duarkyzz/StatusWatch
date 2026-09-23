@@ -1,5 +1,7 @@
 import sys
 
+from PySide6.QtCore import Qt
+
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -8,7 +10,8 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QLabel,
     QLineEdit,
-    QStackedWidget
+    QStackedWidget,
+    QFrame
 )
 
 
@@ -36,7 +39,7 @@ class LoginPage(QWidget):
         # Botões
         self.botao_login = QPushButton("Login")
         self.botao_cadastro = QPushButton("Cadastre-se")
-        layout.addWidget(self.botao_cadastro, alignment=Qt.AlimentFlag.AlingCenter)
+        
 
         # Adicionando os elementos ao layout
         layout.addWidget(self.label_email_login)
@@ -46,7 +49,7 @@ class LoginPage(QWidget):
         layout.addWidget(self.input_senha_login)
 
         layout.addWidget(self.botao_login)
-        layout.addWidget(self.botao_cadastro)
+        layout.addWidget(self.botao_cadastro, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.setLayout(layout)
 
