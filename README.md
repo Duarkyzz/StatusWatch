@@ -1,10 +1,12 @@
 # StatusWatch 🔎
 
-Monitor de sites e APIs desenvolvido em **Python**, com armazenamento em **PostgreSQL** e interface desktop em desenvolvimento.
+Monitor de sites e APIs desenvolvido em **Python**, com interface desktop em **PySide6** e persistência de dados em **PostgreSQL**.
 
-O **StatusWatch** monitora URLs, verifica respostas HTTP, mede o tempo de resposta e mantém um histórico das verificações.
+O **StatusWatch** permite monitorar URLs, verificar disponibilidade e respostas HTTP, medir o tempo de resposta e manter um histórico das verificações realizadas por cada usuário.
 
-O projeto começou como uma aplicação via terminal e está evoluindo para uma aplicação desktop com autenticação, monitoramento e histórico integrado.
+O projeto começou como uma aplicação via terminal e evoluiu para uma aplicação desktop com autenticação, dashboard e integração com banco de dados.
+
+> 🚀 **StatusWatch Beta — primeira versão lançada em 24/09/2026.**
 
 ---
 
@@ -14,10 +16,14 @@ O projeto começou como uma aplicação via terminal e está evoluindo para uma 
 - 📡 Verificação de status HTTP
 - ⏱️ Medição do tempo de resposta
 - 🛡️ Tratamento de erros e timeout
-- 🔄 Múltiplas verificações
-- 🗄️ Histórico de verificações em PostgreSQL
 - 👤 Cadastro e autenticação de usuários
-- 🖥️ Interface desktop com PySide6 em desenvolvimento
+- 🖥️ Interface desktop desenvolvida com PySide6
+- 📊 Dashboard para acompanhamento das verificações
+- 🗄️ Persistência das verificações em PostgreSQL
+- 📋 Histórico de monitoramento por usuário
+- 🔄 Suporte à verificação de diferentes URLs
+- ☁️ Banco de dados PostgreSQL hospedado no Supabase
+- 🔐 Separação dos dados de monitoramento por usuário
 
 ---
 
@@ -36,7 +42,11 @@ O projeto começou como uma aplicação via terminal e está evoluindo para uma 
 ## 🔄 Como funciona
 
 ```text
-Usuário informa uma URL
+Usuário cria uma conta ou realiza login
+        ↓
+Acessa o Dashboard
+        ↓
+Informa uma URL
         ↓
 StatusWatch realiza uma requisição HTTP
         ↓
@@ -48,56 +58,86 @@ Trata erros e timeouts
         ↓
 Salva a verificação no PostgreSQL
         ↓
+Atualiza o Dashboard
+        ↓
 Histórico disponível para consulta
 ```
 
-A aplicação utiliza um banco **PostgreSQL hospedado no Supabase**. As credenciais de conexão são mantidas localmente através de variáveis de ambiente e não fazem parte do repositório.
+Cada verificação registra informações como:
+
+- URL monitorada
+- Status do serviço
+- Código HTTP
+- Tempo de resposta
+- Data da verificação
+- Usuário responsável pela verificação
+
+Os dados são armazenados em um banco **PostgreSQL hospedado no Supabase** e associados à conta autenticada.
 
 ---
 
-## 🗺️ Roadmap
+## 🖥️ Interface
 
-### ✅ Concluído
+O StatusWatch possui uma interface desktop construída com **PySide6**, utilizando um visual dark e minimalista.
 
-- [x] Monitoramento de URLs
-- [x] Requisições HTTP
-- [x] Status HTTP
-- [x] Tempo de resposta
-- [x] Tratamento de erros e timeout
-- [x] Histórico de verificações
-- [x] Migração de SQLite para PostgreSQL
-- [x] Banco PostgreSQL hospedado no Supabase
-- [x] Estrutura inicial de usuários
-- [x] Cadastro e validação no banco
-- [x] Estrutura inicial da interface com PySide6
+A aplicação é dividida em:
 
-### 🔨 Em desenvolvimento
+### Login
 
-- [ ] Integrar cadastro à interface
-- [ ] Integrar login à interface
-- [ ] Finalizar navegação entre Login, Cadastro e Dashboard
-- [ ] Aplicar interface dark e minimalista
-- [ ] Exibir histórico no Dashboard
-- [ ] Cadastro e gerenciamento de múltiplas URLs
+Permite que usuários cadastrados realizem autenticação para acessar seus dados de monitoramento.
 
-### 🔮 Próximos passos
+### Cadastro
 
-- [ ] Monitoramento automático
-- [ ] Monitoramento simultâneo de múltiplas URLs
-- [ ] Gráficos de tempo de resposta
-- [ ] API com FastAPI
-- [ ] Sistema de notificações
-- [ ] Melhorias de segurança na autenticação
-- [ ] Gerar executável para Windows
-- [ ] Deploy
+Permite criar uma nova conta, armazenando os dados do usuário no PostgreSQL.
+
+### Dashboard
+
+Centraliza o monitoramento e apresenta informações como:
+
+- Quantidade de serviços monitorados
+- Serviços online
+- Serviços offline
+- Últimas verificações
+- Código HTTP
+- Tempo de resposta
+
+### Histórico
+
+Exibe as verificações armazenadas no banco de dados e vinculadas ao usuário autenticado.
+
+---
+
+## 🗄️ Banco de dados
+
+O projeto utiliza **PostgreSQL**, hospedado através do **Supabase**.
+
+As principais informações armazenadas são separadas entre usuários e verificações.
+
+```text
+usuarios
+├── id
+├── email
+└── senha_hash
+
+verificacoes
+├── id
+├── usuario_id
+├── url
+├── status_code
+├── status
+├── response_time
+└── created_at
+```
+
+A associação através de `usuario_id` permite que o histórico de monitoramento seja separado por usuário.
 
 ---
 
 ## 🔐 Segurança
 
-As credenciais do PostgreSQL são armazenadas através de variáveis de ambiente.
+As credenciais de conexão com o PostgreSQL são carregadas através de variáveis de ambiente e não ficam armazenadas diretamente no código-fonte.
 
-O repositório utiliza:
+O projeto utiliza:
 
 ```text
 .env          → credenciais locais (não versionado)
@@ -105,15 +145,27 @@ O repositório utiliza:
 .gitignore    → impede arquivos sensíveis e gerados de serem versionados
 ```
 
-Nenhuma senha ou credencial do banco deve ser adicionada diretamente ao código.
+As senhas dos usuários não são armazenadas diretamente no banco. Antes da persistência, são transformadas em hash.
 
-> A autenticação ainda está em desenvolvimento e não deve ser considerada pronta para uso em produção.
+> ⚠️ O StatusWatch está atualmente em versão **Beta** e não deve ser considerado um sistema pronto para ambientes críticos ou de produção.
+
+---
+
+## 📦 Status do projeto
+
+**Versão atual:** Beta  
+**Primeira versão Beta:** 24/09/2026  
+**Estado:** Em desenvolvimento
+
+A versão Beta representa a primeira versão funcional do StatusWatch com interface gráfica, autenticação, monitoramento, dashboard, histórico e persistência de dados integrados.
 
 ---
 
 ## 🎯 Objetivo
 
-O StatusWatch é um projeto de estudo e portfólio criado para aplicar conceitos de desenvolvimento backend na prática, incluindo:
+O StatusWatch é um projeto de estudo e portfólio criado para aplicar conceitos de desenvolvimento de software e backend em uma aplicação funcional.
+
+Durante seu desenvolvimento são aplicados conceitos como:
 
 - Python
 - Requisições HTTP
@@ -122,9 +174,11 @@ O StatusWatch é um projeto de estudo e portfólio criado para aplicar conceitos
 - Persistência de dados
 - Autenticação
 - Interfaces gráficas
-- Organização e evolução de aplicações
+- Integração entre aplicação e banco de dados
+- Organização e evolução de código
+- Git e GitHub
 
-O objetivo é transformar gradualmente um monitor simples de URLs em uma aplicação completa de monitoramento.
+O projeto também demonstra a evolução de uma aplicação inicialmente executada via terminal para um software desktop integrado a um banco de dados remoto.
 
 ---
 
@@ -132,6 +186,6 @@ O objetivo é transformar gradualmente um monitor simples de URLs em uma aplica�
 
 **Eduardo Queiroz**
 
-Estudante de Análise e Desenvolvimento de Sistemas, com foco em desenvolvimento backend e Python.
+Estudante de Análise e Desenvolvimento de Sistemas, com foco em desenvolvimento backend, Python, APIs, bancos de dados e automações.
 
 > Projeto desenvolvido para aprendizado, prática e construção de portfólio.
