@@ -1,4 +1,4 @@
-requests
-PySide6
-python-dotenv
-psycopg2-binary
+requests==2.34.2
+PySide6==6.11.2
+python-dotenv==1.2.3
+psycopg2-binary==2.9.13
