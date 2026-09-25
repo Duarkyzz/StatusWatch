@@ -1,9 +1,21 @@
-
 import sys
+from datetime import datetime
 
-from app.database import cadastrar_usuario, fazer_login
+from app.database import (
+    cadastrar_usuario,
+    fazer_login,
+    salvar_verificacao,
+    buscar_historico
+)
 
-from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve
+from app.monitor import verificar_url
+
+from PySide6.QtCore import (
+    Qt,
+    QPropertyAnimation,
+    QEasingCurve
+)
+
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -16,6 +28,7 @@ from PySide6.QtWidgets import (
     QStackedWidget,
     QFrame,
     QTableWidget,
+    QTableWidgetItem,
     QHeaderView,
     QAbstractItemView,
     QGraphicsOpacityEffect,
@@ -43,15 +56,19 @@ class LoginPage(QWidget):
 
         layout_principal.addStretch()
 
-        # --------------------------------------------------
-        # Card de login
-        # --------------------------------------------------
-
         self.card_login = QFrame()
-        self.card_login.setObjectName("authCard")
-        self.card_login.setFixedWidth(420)
 
-        layout_card = QVBoxLayout(self.card_login)
+        self.card_login.setObjectName(
+            "authCard"
+        )
+
+        self.card_login.setFixedWidth(
+            420
+        )
+
+        layout_card = QVBoxLayout(
+            self.card_login
+        )
 
         layout_card.setContentsMargins(
             36,
@@ -60,41 +77,45 @@ class LoginPage(QWidget):
             36
         )
 
-        layout_card.setSpacing(14)
+        layout_card.setSpacing(
+            14
+        )
 
-        # --------------------------------------------------
-        # Título
-        # --------------------------------------------------
+        self.titulo = QLabel(
+            "StatusWatch"
+        )
 
-        self.titulo = QLabel("StatusWatch")
-        self.titulo.setObjectName("authTitle")
+        self.titulo.setObjectName(
+            "authTitle"
+        )
 
         self.titulo.setAlignment(
             Qt.AlignmentFlag.AlignCenter
         )
 
-        # --------------------------------------------------
-        # Subtítulo
-        # --------------------------------------------------
-
         self.subtitulo = QLabel(
             "Monitore seus sites e serviços em um só lugar."
         )
 
-        self.subtitulo.setObjectName("authSubtitle")
+        self.subtitulo.setObjectName(
+            "authSubtitle"
+        )
 
         self.subtitulo.setAlignment(
             Qt.AlignmentFlag.AlignCenter
         )
 
-        self.subtitulo.setWordWrap(True)
+        self.subtitulo.setWordWrap(
+            True
+        )
 
-        # --------------------------------------------------
-        # Campo de e-mail
-        # --------------------------------------------------
+        self.label_email_login = QLabel(
+            "E-mail"
+        )
 
-        self.label_email_login = QLabel("E-mail")
-        self.label_email_login.setObjectName("fieldLabel")
+        self.label_email_login.setObjectName(
+            "fieldLabel"
+        )
 
         self.input_email_login = QLineEdit()
 
@@ -102,12 +123,13 @@ class LoginPage(QWidget):
             "seuemail@exemplo.com"
         )
 
-        # --------------------------------------------------
-        # Campo de senha
-        # --------------------------------------------------
+        self.label_senha_login = QLabel(
+            "Senha"
+        )
 
-        self.label_senha_login = QLabel("Senha")
-        self.label_senha_login.setObjectName("fieldLabel")
+        self.label_senha_login.setObjectName(
+            "fieldLabel"
+        )
 
         self.input_senha_login = QLineEdit()
 
@@ -119,50 +141,69 @@ class LoginPage(QWidget):
             QLineEdit.EchoMode.Password
         )
 
-        # --------------------------------------------------
-        # Botão de login
-        # --------------------------------------------------
+        self.botao_login = QPushButton(
+            "Entrar"
+        )
 
-        self.botao_login = QPushButton("Entrar")
-        self.botao_login.setObjectName("primaryButton")
+        self.botao_login.setObjectName(
+            "primaryButton"
+        )
 
         self.botao_login.setCursor(
             Qt.CursorShape.PointingHandCursor
         )
 
-        # --------------------------------------------------
-        # Botão de cadastro
-        # --------------------------------------------------
-
         self.botao_cadastro = QPushButton(
             "Criar uma conta"
         )
 
-        self.botao_cadastro.setObjectName("linkButton")
+        self.botao_cadastro.setObjectName(
+            "linkButton"
+        )
 
         self.botao_cadastro.setCursor(
             Qt.CursorShape.PointingHandCursor
         )
 
-        # --------------------------------------------------
-        # Adicionando elementos ao card
-        # --------------------------------------------------
+        layout_card.addWidget(
+            self.titulo
+        )
 
-        layout_card.addWidget(self.titulo)
-        layout_card.addWidget(self.subtitulo)
+        layout_card.addWidget(
+            self.subtitulo
+        )
 
-        layout_card.addSpacing(14)
+        layout_card.addSpacing(
+            14
+        )
 
-        layout_card.addWidget(self.label_email_login)
-        layout_card.addWidget(self.input_email_login)
+        layout_card.addWidget(
+            self.label_email_login
+        )
 
-        layout_card.addWidget(self.label_senha_login)
-        layout_card.addWidget(self.input_senha_login)
+        layout_card.addWidget(
+            self.input_email_login
+        )
 
-        layout_card.addSpacing(8)
+        layout_card.addWidget(
+            self.label_senha_login
+        )
 
-        layout_card.addWidget(self.botao_login)
-        layout_card.addWidget(self.botao_cadastro)
+        layout_card.addWidget(
+            self.input_senha_login
+        )
+
+        layout_card.addSpacing(
+            8
+        )
+
+        layout_card.addWidget(
+            self.botao_login
+        )
+
+        layout_card.addWidget(
+            self.botao_cadastro
+        )
 
         layout_principal.addWidget(
             self.card_login,
@@ -181,7 +222,9 @@ class CadastroPage(QWidget):
     def __init__(self):
         super().__init__()
 
-        layout_principal = QVBoxLayout(self)
+        layout_principal = QVBoxLayout(
+            self
+        )
 
         layout_principal.setContentsMargins(
             40,
@@ -192,13 +235,15 @@ class CadastroPage(QWidget):
 
         layout_principal.addStretch()
 
-        # --------------------------------------------------
-        # Card de cadastro
-        # --------------------------------------------------
-
         self.card_cadastro = QFrame()
-        self.card_cadastro.setObjectName("authCard")
-        self.card_cadastro.setFixedWidth(420)
+
+        self.card_cadastro.setObjectName(
+            "authCard"
+        )
+
+        self.card_cadastro.setFixedWidth(
+            420
+        )
 
         layout_card = QVBoxLayout(
             self.card_cadastro
@@ -211,41 +256,45 @@ class CadastroPage(QWidget):
             36
         )
 
-        layout_card.setSpacing(14)
+        layout_card.setSpacing(
+            14
+        )
 
-        # --------------------------------------------------
-        # Título
-        # --------------------------------------------------
+        self.titulo = QLabel(
+            "Criar conta"
+        )
 
-        self.titulo = QLabel("Criar conta")
-        self.titulo.setObjectName("authTitle")
+        self.titulo.setObjectName(
+            "authTitle"
+        )
 
         self.titulo.setAlignment(
             Qt.AlignmentFlag.AlignCenter
         )
 
-        # --------------------------------------------------
-        # Subtítulo
-        # --------------------------------------------------
-
         self.subtitulo = QLabel(
             "Crie sua conta para começar a monitorar seus serviços."
         )
 
-        self.subtitulo.setObjectName("authSubtitle")
+        self.subtitulo.setObjectName(
+            "authSubtitle"
+        )
 
         self.subtitulo.setAlignment(
             Qt.AlignmentFlag.AlignCenter
         )
 
-        self.subtitulo.setWordWrap(True)
+        self.subtitulo.setWordWrap(
+            True
+        )
 
-        # --------------------------------------------------
-        # Campo de e-mail
-        # --------------------------------------------------
+        self.label_email_cadastro = QLabel(
+            "E-mail"
+        )
 
-        self.label_email_cadastro = QLabel("E-mail")
-        self.label_email_cadastro.setObjectName("fieldLabel")
+        self.label_email_cadastro.setObjectName(
+            "fieldLabel"
+        )
 
         self.input_email_cadastro = QLineEdit()
 
@@ -253,12 +302,13 @@ class CadastroPage(QWidget):
             "seuemail@exemplo.com"
         )
 
-        # --------------------------------------------------
-        # Campo de senha
-        # --------------------------------------------------
+        self.label_senha_cadastro = QLabel(
+            "Senha"
+        )
 
-        self.label_senha_cadastro = QLabel("Senha")
-        self.label_senha_cadastro.setObjectName("fieldLabel")
+        self.label_senha_cadastro.setObjectName(
+            "fieldLabel"
+        )
 
         self.input_senha_cadastro = QLineEdit()
 
@@ -270,15 +320,13 @@ class CadastroPage(QWidget):
             QLineEdit.EchoMode.Password
         )
 
-        # --------------------------------------------------
-        # Confirmação de senha
-        # --------------------------------------------------
-
         self.label_confirmacao = QLabel(
             "Confirme sua senha"
         )
 
-        self.label_confirmacao.setObjectName("fieldLabel")
+        self.label_confirmacao.setObjectName(
+            "fieldLabel"
+        )
 
         self.input_confirmacao = QLineEdit()
 
@@ -289,10 +337,6 @@ class CadastroPage(QWidget):
         self.input_confirmacao.setEchoMode(
             QLineEdit.EchoMode.Password
         )
-
-        # --------------------------------------------------
-        # Botão cadastrar
-        # --------------------------------------------------
 
         self.botao_cadastrar = QPushButton(
             "Cadastrar"
@@ -306,10 +350,6 @@ class CadastroPage(QWidget):
             Qt.CursorShape.PointingHandCursor
         )
 
-        # --------------------------------------------------
-        # Botão voltar
-        # --------------------------------------------------
-
         self.botao_voltar = QPushButton(
             "Voltar para o login"
         )
@@ -322,14 +362,17 @@ class CadastroPage(QWidget):
             Qt.CursorShape.PointingHandCursor
         )
 
-        # --------------------------------------------------
-        # Adicionando elementos
-        # --------------------------------------------------
+        layout_card.addWidget(
+            self.titulo
+        )
 
-        layout_card.addWidget(self.titulo)
-        layout_card.addWidget(self.subtitulo)
+        layout_card.addWidget(
+            self.subtitulo
+        )
 
-        layout_card.addSpacing(14)
+        layout_card.addSpacing(
+            14
+        )
 
         layout_card.addWidget(
             self.label_email_cadastro
@@ -355,7 +398,9 @@ class CadastroPage(QWidget):
             self.input_confirmacao
         )
 
-        layout_card.addSpacing(8)
+        layout_card.addSpacing(
+            8
+        )
 
         layout_card.addWidget(
             self.botao_cadastrar
@@ -382,9 +427,13 @@ class StatCard(QFrame):
     def __init__(self, titulo, valor):
         super().__init__()
 
-        self.setObjectName("statCard")
+        self.setObjectName(
+            "statCard"
+        )
 
-        layout = QVBoxLayout(self)
+        layout = QVBoxLayout(
+            self
+        )
 
         layout.setContentsMargins(
             22,
@@ -393,20 +442,37 @@ class StatCard(QFrame):
             18
         )
 
-        layout.setSpacing(4)
+        layout.setSpacing(
+            4
+        )
 
-        self.label_titulo = QLabel(titulo)
-        self.label_titulo.setObjectName("statTitle")
+        self.label_titulo = QLabel(
+            titulo
+        )
 
-        self.label_valor = QLabel(valor)
-        self.label_valor.setObjectName("statValue")
+        self.label_titulo.setObjectName(
+            "statTitle"
+        )
 
-        layout.addWidget(self.label_titulo)
-        layout.addWidget(self.label_valor)
+        self.label_valor = QLabel(
+            valor
+        )
+
+        self.label_valor.setObjectName(
+            "statValue"
+        )
+
+        layout.addWidget(
+            self.label_titulo
+        )
+
+        layout.addWidget(
+            self.label_valor
+        )
 
 
 # ==========================================================
-# TELA DO DASHBOARD
+# DASHBOARD
 # ==========================================================
 
 class DashboardPage(QWidget):
@@ -414,7 +480,9 @@ class DashboardPage(QWidget):
     def __init__(self):
         super().__init__()
 
-        layout_principal = QHBoxLayout(self)
+        layout_principal = QHBoxLayout(
+            self
+        )
 
         layout_principal.setContentsMargins(
             0,
@@ -423,15 +491,23 @@ class DashboardPage(QWidget):
             0
         )
 
-        layout_principal.setSpacing(0)
+        layout_principal.setSpacing(
+            0
+        )
 
         # ==================================================
-        # MENU LATERAL
+        # SIDEBAR
         # ==================================================
 
         self.sidebar = QFrame()
-        self.sidebar.setObjectName("sidebar")
-        self.sidebar.setFixedWidth(220)
+
+        self.sidebar.setObjectName(
+            "sidebar"
+        )
+
+        self.sidebar.setFixedWidth(
+            220
+        )
 
         sidebar_layout = QVBoxLayout(
             self.sidebar
@@ -444,21 +520,25 @@ class DashboardPage(QWidget):
             28
         )
 
-        sidebar_layout.setSpacing(10)
+        sidebar_layout.setSpacing(
+            10
+        )
 
-        # --------------------------------------------------
-        # Logo / nome
-        # --------------------------------------------------
+        self.logo = QLabel(
+            "StatusWatch"
+        )
 
-        self.logo = QLabel("StatusWatch")
-        self.logo.setObjectName("sidebarLogo")
+        self.logo.setObjectName(
+            "sidebarLogo"
+        )
 
-        sidebar_layout.addWidget(self.logo)
-        sidebar_layout.addSpacing(30)
+        sidebar_layout.addWidget(
+            self.logo
+        )
 
-        # --------------------------------------------------
-        # Navegação
-        # --------------------------------------------------
+        sidebar_layout.addSpacing(
+            30
+        )
 
         self.menu_dashboard = QPushButton(
             "Dashboard"
@@ -494,12 +574,13 @@ class DashboardPage(QWidget):
 
         sidebar_layout.addStretch()
 
-        # --------------------------------------------------
-        # Botão sair
-        # --------------------------------------------------
+        self.botao_sair = QPushButton(
+            "Sair"
+        )
 
-        self.botao_sair = QPushButton("Sair")
-        self.botao_sair.setObjectName("logoutButton")
+        self.botao_sair.setObjectName(
+            "logoutButton"
+        )
 
         self.botao_sair.setCursor(
             Qt.CursorShape.PointingHandCursor
@@ -510,13 +591,19 @@ class DashboardPage(QWidget):
         )
 
         # ==================================================
-        # CONTEÚDO PRINCIPAL
+        # ÁREA CENTRAL
         # ==================================================
 
-        self.conteudo = QWidget()
+        self.paginas = QStackedWidget()
+
+        # ==================================================
+        # PÁGINA PRINCIPAL DO DASHBOARD
+        # ==================================================
+
+        self.pagina_dashboard = QWidget()
 
         conteudo_layout = QVBoxLayout(
-            self.conteudo
+            self.pagina_dashboard
         )
 
         conteudo_layout.setContentsMargins(
@@ -526,11 +613,9 @@ class DashboardPage(QWidget):
             30
         )
 
-        conteudo_layout.setSpacing(22)
-
-        # --------------------------------------------------
-        # Cabeçalho
-        # --------------------------------------------------
+        conteudo_layout.setSpacing(
+            22
+        )
 
         self.dashboard_titulo = QLabel(
             "Dashboard"
@@ -557,11 +642,14 @@ class DashboardPage(QWidget):
         )
 
         # ==================================================
-        # CARDS DE ESTATÍSTICA
+        # ESTATÍSTICAS
         # ==================================================
 
         stats_layout = QHBoxLayout()
-        stats_layout.setSpacing(16)
+
+        stats_layout.setSpacing(
+            16
+        )
 
         self.card_monitorados = StatCard(
             "Monitorados",
@@ -595,11 +683,14 @@ class DashboardPage(QWidget):
         )
 
         # ==================================================
-        # CADASTRAR URL
+        # ADICIONAR MONITOR
         # ==================================================
 
         self.monitor_card = QFrame()
-        self.monitor_card.setObjectName("contentCard")
+
+        self.monitor_card.setObjectName(
+            "contentCard"
+        )
 
         monitor_layout = QVBoxLayout(
             self.monitor_card
@@ -612,7 +703,9 @@ class DashboardPage(QWidget):
             20
         )
 
-        monitor_layout.setSpacing(12)
+        monitor_layout.setSpacing(
+            12
+        )
 
         self.monitor_titulo = QLabel(
             "Adicionar monitor"
@@ -627,7 +720,10 @@ class DashboardPage(QWidget):
         )
 
         url_layout = QHBoxLayout()
-        url_layout.setSpacing(10)
+
+        url_layout.setSpacing(
+            10
+        )
 
         self.input_url = QLineEdit()
 
@@ -643,7 +739,9 @@ class DashboardPage(QWidget):
             "primaryButton"
         )
 
-        self.botao_adicionar.setFixedWidth(130)
+        self.botao_adicionar.setFixedWidth(
+            130
+        )
 
         self.botao_adicionar.setCursor(
             Qt.CursorShape.PointingHandCursor
@@ -666,10 +764,11 @@ class DashboardPage(QWidget):
         )
 
         # ==================================================
-        # TABELA DE SERVIÇOS
+        # TABELA PRINCIPAL
         # ==================================================
 
         self.servicos_card = QFrame()
+
         self.servicos_card.setObjectName(
             "contentCard"
         )
@@ -685,10 +784,12 @@ class DashboardPage(QWidget):
             20
         )
 
-        servicos_layout.setSpacing(14)
+        servicos_layout.setSpacing(
+            14
+        )
 
         self.servicos_titulo = QLabel(
-            "Serviços monitorados"
+            "Últimas verificações"
         )
 
         self.servicos_titulo.setObjectName(
@@ -699,35 +800,7 @@ class DashboardPage(QWidget):
             self.servicos_titulo
         )
 
-        self.tabela_servicos = QTableWidget()
-
-        self.tabela_servicos.setColumnCount(5)
-
-        self.tabela_servicos.setHorizontalHeaderLabels(
-            [
-                "URL",
-                "Status",
-                "HTTP",
-                "Resposta",
-                "Última verificação"
-            ]
-        )
-
-        self.tabela_servicos.setEditTriggers(
-            QAbstractItemView.EditTrigger.NoEditTriggers
-        )
-
-        self.tabela_servicos.setSelectionBehavior(
-            QAbstractItemView.SelectionBehavior.SelectRows
-        )
-
-        self.tabela_servicos.verticalHeader().setVisible(
-            False
-        )
-
-        self.tabela_servicos.horizontalHeader().setSectionResizeMode(
-            QHeaderView.ResizeMode.Stretch
-        )
+        self.tabela_servicos = self.criar_tabela()
 
         servicos_layout.addWidget(
             self.tabela_servicos
@@ -737,13 +810,200 @@ class DashboardPage(QWidget):
             self.servicos_card
         )
 
+        # ==================================================
+        # PÁGINA HISTÓRICO
+        # ==================================================
+
+        self.pagina_historico = QWidget()
+
+        historico_layout = QVBoxLayout(
+            self.pagina_historico
+        )
+
+        historico_layout.setContentsMargins(
+            34,
+            30,
+            34,
+            30
+        )
+
+        historico_layout.setSpacing(
+            22
+        )
+
+        self.historico_titulo = QLabel(
+            "Histórico"
+        )
+
+        self.historico_titulo.setObjectName(
+            "pageTitle"
+        )
+
+        self.historico_subtitulo = QLabel(
+            "Consulte todas as verificações realizadas."
+        )
+
+        self.historico_subtitulo.setObjectName(
+            "pageSubtitle"
+        )
+
+        historico_layout.addWidget(
+            self.historico_titulo
+        )
+
+        historico_layout.addWidget(
+            self.historico_subtitulo
+        )
+
+        self.historico_card = QFrame()
+
+        self.historico_card.setObjectName(
+            "contentCard"
+        )
+
+        historico_card_layout = QVBoxLayout(
+            self.historico_card
+        )
+
+        historico_card_layout.setContentsMargins(
+            22,
+            20,
+            22,
+            20
+        )
+
+        self.tabela_historico = self.criar_tabela()
+
+        historico_card_layout.addWidget(
+            self.tabela_historico
+        )
+
+        historico_layout.addWidget(
+            self.historico_card
+        )
+
+        # ==================================================
+        # ADICIONAR PÁGINAS
+        # ==================================================
+
+        self.paginas.addWidget(
+            self.pagina_dashboard
+        )
+
+        self.paginas.addWidget(
+            self.pagina_historico
+        )
+
         layout_principal.addWidget(
             self.sidebar
         )
 
         layout_principal.addWidget(
-            self.conteudo
+            self.paginas
         )
+
+        # ==================================================
+        # NAVEGAÇÃO INTERNA
+        # ==================================================
+
+        self.menu_dashboard.clicked.connect(
+            self.abrir_dashboard
+        )
+
+        self.menu_historico.clicked.connect(
+            self.abrir_historico
+        )
+
+    def criar_tabela(self):
+
+        tabela = QTableWidget()
+
+        tabela.setColumnCount(
+            5
+        )
+
+        tabela.setHorizontalHeaderLabels(
+            [
+                "URL",
+                "Status",
+                "HTTP",
+                "Resposta",
+                "Data"
+            ]
+        )
+
+        tabela.setEditTriggers(
+            QAbstractItemView.EditTrigger.NoEditTriggers
+        )
+
+        tabela.setSelectionBehavior(
+            QAbstractItemView.SelectionBehavior.SelectRows
+        )
+
+        tabela.setSelectionMode(
+            QAbstractItemView.SelectionMode.SingleSelection
+        )
+
+        tabela.verticalHeader().setVisible(
+            False
+        )
+
+        tabela.horizontalHeader().setSectionResizeMode(
+            QHeaderView.ResizeMode.Stretch
+        )
+
+        tabela.setAlternatingRowColors(
+            True
+        )
+
+        return tabela
+
+    def abrir_dashboard(self):
+
+        self.paginas.setCurrentWidget(
+            self.pagina_dashboard
+        )
+
+        self.menu_dashboard.setObjectName(
+            "navButtonActive"
+        )
+
+        self.menu_historico.setObjectName(
+            "navButton"
+        )
+
+        self.atualizar_estilo_menu()
+
+    def abrir_historico(self):
+
+        self.paginas.setCurrentWidget(
+            self.pagina_historico
+        )
+
+        self.menu_dashboard.setObjectName(
+            "navButton"
+        )
+
+        self.menu_historico.setObjectName(
+            "navButtonActive"
+        )
+
+        self.atualizar_estilo_menu()
+
+    def atualizar_estilo_menu(self):
+
+        for botao in (
+            self.menu_dashboard,
+            self.menu_historico
+        ):
+
+            botao.style().unpolish(
+                botao
+            )
+
+            botao.style().polish(
+                botao
+            )
 
 
 # ==========================================================
@@ -755,9 +1015,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # --------------------------------------------------
-        # Configurações da janela
-        # --------------------------------------------------
+        self.usuario_atual = None
 
         self.setWindowTitle(
             "StatusWatch"
@@ -773,23 +1031,11 @@ class MainWindow(QMainWindow):
             600
         )
 
-        # --------------------------------------------------
-        # Pilha de páginas
-        # --------------------------------------------------
-
         self.pilha = QStackedWidget()
-
-        # --------------------------------------------------
-        # Criando páginas
-        # --------------------------------------------------
 
         self.login = LoginPage()
         self.cadastro = CadastroPage()
         self.dashboard = DashboardPage()
-
-        # --------------------------------------------------
-        # Adicionando páginas à pilha
-        # --------------------------------------------------
 
         self.pilha.addWidget(
             self.login
@@ -807,9 +1053,9 @@ class MainWindow(QMainWindow):
             self.pilha
         )
 
-        # --------------------------------------------------
-        # Navegação
-        # --------------------------------------------------
+        # ==================================================
+        # NAVEGAÇÃO
+        # ==================================================
 
         self.login.botao_cadastro.clicked.connect(
             self.abrir_cadastro
@@ -823,9 +1069,9 @@ class MainWindow(QMainWindow):
             self.realizar_logout
         )
 
-        # --------------------------------------------------
-        # Banco de dados
-        # --------------------------------------------------
+        # ==================================================
+        # LOGIN / CADASTRO
+        # ==================================================
 
         self.login.botao_login.clicked.connect(
             self.realizar_login
@@ -835,13 +1081,29 @@ class MainWindow(QMainWindow):
             self.realizar_cadastro
         )
 
-        # ENTER também executa login/cadastro
         self.login.input_senha_login.returnPressed.connect(
             self.realizar_login
         )
 
         self.cadastro.input_confirmacao.returnPressed.connect(
             self.realizar_cadastro
+        )
+
+        # ==================================================
+        # MONITORAMENTO
+        # ==================================================
+
+        self.dashboard.botao_adicionar.clicked.connect(
+            self.adicionar_monitor
+        )
+
+        self.dashboard.input_url.returnPressed.connect(
+            self.adicionar_monitor
+        )
+
+        # Tela inicial
+        self.pilha.setCurrentWidget(
+            self.login
         )
 
     # ======================================================
@@ -869,10 +1131,6 @@ class MainWindow(QMainWindow):
             .text()
         )
 
-        # --------------------------------------------------
-        # Campos vazios
-        # --------------------------------------------------
-
         if not email or not senha or not confirmacao:
 
             QMessageBox.warning(
@@ -883,10 +1141,6 @@ class MainWindow(QMainWindow):
 
             return
 
-        # --------------------------------------------------
-        # Confirmação de senha
-        # --------------------------------------------------
-
         if senha != confirmacao:
 
             QMessageBox.warning(
@@ -895,16 +1149,7 @@ class MainWindow(QMainWindow):
                 "As senhas digitadas não são iguais."
             )
 
-            self.cadastro.input_senha_cadastro.clear()
-            self.cadastro.input_confirmacao.clear()
-
-            self.cadastro.input_senha_cadastro.setFocus()
-
             return
-
-        # --------------------------------------------------
-        # Banco de dados
-        # --------------------------------------------------
 
         try:
 
@@ -913,78 +1158,38 @@ class MainWindow(QMainWindow):
                 senha
             )
 
-            print(
-                f"Resultado do cadastro: {resultado}"
-            )
+            if "sucesso" in resultado.lower():
 
-            # A função pode retornar False
-            if resultado is False:
+                QMessageBox.information(
+                    self,
+                    "Cadastro concluído",
+                    resultado
+                )
+
+                self.login.input_email_login.setText(
+                    email
+                )
+
+                self.cadastro.input_email_cadastro.clear()
+                self.cadastro.input_senha_cadastro.clear()
+                self.cadastro.input_confirmacao.clear()
+
+                self.abrir_login()
+
+                self.login.input_senha_login.setFocus()
+
+            else:
 
                 QMessageBox.warning(
                     self,
                     "Cadastro",
-                    "Não foi possível criar a conta."
+                    resultado
                 )
-
-                return
-
-            # A função também pode retornar uma mensagem
-            if isinstance(resultado, str):
-
-                resultado_lower = resultado.lower()
-
-                mensagens_erro = (
-                    "já cadastrado",
-                    "ja cadastrado",
-                    "erro",
-                    "inválido",
-                    "invalido"
-                )
-
-                if any(
-                    mensagem in resultado_lower
-                    for mensagem in mensagens_erro
-                ):
-
-                    QMessageBox.warning(
-                        self,
-                        "Cadastro",
-                        resultado
-                    )
-
-                    return
-
-            # --------------------------------------------------
-            # Cadastro concluído
-            # --------------------------------------------------
-
-            QMessageBox.information(
-                self,
-                "Cadastro concluído",
-                "Conta criada com sucesso! Agora você pode entrar."
-            )
-
-            # Limpa os campos
-            self.cadastro.input_email_cadastro.clear()
-            self.cadastro.input_senha_cadastro.clear()
-            self.cadastro.input_confirmacao.clear()
-
-            # Coloca o e-mail automaticamente no login
-            self.login.input_email_login.setText(
-                email
-            )
-
-            self.login.input_senha_login.clear()
-
-            # Volta ao login
-            self.abrir_login()
-
-            self.login.input_senha_login.setFocus()
 
         except Exception as erro:
 
             print(
-                f"Erro ao cadastrar usuário: {erro}"
+                f"Erro no cadastro: {erro}"
             )
 
             QMessageBox.critical(
@@ -1012,10 +1217,6 @@ class MainWindow(QMainWindow):
             .text()
         )
 
-        # --------------------------------------------------
-        # Campos vazios
-        # --------------------------------------------------
-
         if not email or not senha:
 
             QMessageBox.warning(
@@ -1026,76 +1227,35 @@ class MainWindow(QMainWindow):
 
             return
 
-        # --------------------------------------------------
-        # Banco de dados
-        # --------------------------------------------------
-
         try:
 
-            resultado = fazer_login(
+            usuario = fazer_login(
                 email,
                 senha
             )
 
-            print(
-                f"Resultado do login: {resultado}"
-            )
+            if usuario is None:
 
-            login_valido = False
-
-            # Caso database.py retorne True
-            if resultado is True:
-
-                login_valido = True
-
-            # Caso database.py retorne texto
-            elif isinstance(resultado, str):
-
-                resultado_lower = resultado.lower()
-
-                mensagens_sucesso = (
-                    "sucesso",
-                    "login realizado",
-                    "login efetuado"
+                QMessageBox.warning(
+                    self,
+                    "Login inválido",
+                    "E-mail ou senha incorretos."
                 )
-
-                if any(
-                    mensagem in resultado_lower
-                    for mensagem in mensagens_sucesso
-                ):
-
-                    login_valido = True
-
-            # --------------------------------------------------
-            # Login correto
-            # --------------------------------------------------
-
-            if login_valido:
 
                 self.login.input_senha_login.clear()
 
-                self.abrir_dashboard()
-
                 return
 
-            # --------------------------------------------------
-            # Login incorreto
-            # --------------------------------------------------
-
-            QMessageBox.warning(
-                self,
-                "Login inválido",
-                "E-mail ou senha incorretos."
-            )
+            self.usuario_atual = usuario
 
             self.login.input_senha_login.clear()
 
-            self.login.input_senha_login.setFocus()
+            self.abrir_dashboard()
 
         except Exception as erro:
 
             print(
-                f"Erro ao realizar login: {erro}"
+                f"Erro no login: {erro}"
             )
 
             QMessageBox.critical(
@@ -1110,13 +1270,302 @@ class MainWindow(QMainWindow):
 
     def realizar_logout(self):
 
-        # Limpa qualquer senha deixada na tela
-        self.login.input_senha_login.clear()
+        self.usuario_atual = None
 
-        # Volta para o login
+        self.dashboard.tabela_servicos.setRowCount(
+            0
+        )
+
+        self.dashboard.tabela_historico.setRowCount(
+            0
+        )
+
+        self.dashboard.card_monitorados.label_valor.setText(
+            "0"
+        )
+
+        self.dashboard.card_online.label_valor.setText(
+            "0"
+        )
+
+        self.dashboard.card_offline.label_valor.setText(
+            "0"
+        )
+
+        self.dashboard.input_url.clear()
+
         self.abrir_login()
 
-        self.login.input_email_login.setFocus()
+    # ======================================================
+    # ADICIONAR MONITOR
+    # ======================================================
+
+    def adicionar_monitor(self):
+
+        if self.usuario_atual is None:
+
+            QMessageBox.warning(
+                self,
+                "Sessão",
+                "Faça login novamente."
+            )
+
+            self.abrir_login()
+
+            return
+
+        url = (
+            self.dashboard
+            .input_url
+            .text()
+            .strip()
+        )
+
+        if not url:
+
+            QMessageBox.warning(
+                self,
+                "URL",
+                "Digite uma URL para monitorar."
+            )
+
+            return
+
+        # Facilita a digitação.
+        # Se o usuário escrever google.com,
+        # transformamos em https://google.com
+        if not url.startswith(
+            (
+                "http://",
+                "https://"
+            )
+        ):
+
+            url = "https://" + url
+
+        try:
+
+            # Evita múltiplos cliques durante a requisição
+            self.dashboard.botao_adicionar.setEnabled(
+                False
+            )
+
+            self.dashboard.botao_adicionar.setText(
+                "Verificando..."
+            )
+
+            QApplication.processEvents()
+
+            resultado = verificar_url(
+                url
+            )
+
+            salvar_verificacao(
+                resultado,
+                self.usuario_atual["id"]
+            )
+
+            self.dashboard.input_url.clear()
+
+            self.carregar_historico()
+
+        except Exception as erro:
+
+            print(
+                f"Erro ao verificar URL: {erro}"
+            )
+
+            QMessageBox.critical(
+                self,
+                "Erro",
+                "Não foi possível verificar ou salvar essa URL."
+            )
+
+        finally:
+
+            self.dashboard.botao_adicionar.setEnabled(
+                True
+            )
+
+            self.dashboard.botao_adicionar.setText(
+                "Adicionar"
+            )
+
+    # ======================================================
+    # CARREGAR HISTÓRICO
+    # ======================================================
+
+    def carregar_historico(self):
+
+        if self.usuario_atual is None:
+            return
+
+        try:
+
+            historico = buscar_historico(
+                self.usuario_atual["id"]
+            )
+
+            self.preencher_tabela(
+                self.dashboard.tabela_historico,
+                historico
+            )
+
+            # Dashboard mostra somente as últimas verificações
+            self.preencher_tabela(
+                self.dashboard.tabela_servicos,
+                historico[:10]
+            )
+
+            self.atualizar_estatisticas(
+                historico
+            )
+
+        except Exception as erro:
+
+            print(
+                f"Erro ao carregar histórico: {erro}"
+            )
+
+            QMessageBox.critical(
+                self,
+                "Erro",
+                "Não foi possível carregar o histórico."
+            )
+
+    # ======================================================
+    # PREENCHER TABELA
+    # ======================================================
+
+    def preencher_tabela(self, tabela, historico):
+
+        tabela.setRowCount(
+            0
+        )
+
+        for verificacao in historico:
+
+            # Estrutura retornada pelo database:
+            #
+            # 0 = id
+            # 1 = url
+            # 2 = status_code
+            # 3 = status
+            # 4 = response_time
+            # 5 = created_at
+
+            url = verificacao[1]
+            status_code = verificacao[2]
+            status = verificacao[3]
+            response_time = verificacao[4]
+            created_at = verificacao[5]
+
+            linha = tabela.rowCount()
+
+            tabela.insertRow(
+                linha
+            )
+
+            if status_code is None:
+                status_code_texto = "-"
+            else:
+                status_code_texto = str(
+                    status_code
+                )
+
+            if response_time is None:
+                response_time_texto = "-"
+            else:
+                response_time_texto = (
+                    f"{response_time:.2f}s"
+                )
+
+            if isinstance(
+                created_at,
+                datetime
+            ):
+
+                data_texto = created_at.strftime(
+                    "%d/%m/%Y %H:%M:%S"
+                )
+
+            else:
+                data_texto = str(
+                    created_at
+                )
+
+            valores = [
+                url,
+                status,
+                status_code_texto,
+                response_time_texto,
+                data_texto
+            ]
+
+            for coluna, valor in enumerate(
+                valores
+            ):
+
+                item = QTableWidgetItem(
+                    str(valor)
+                )
+
+                tabela.setItem(
+                    linha,
+                    coluna,
+                    item
+                )
+
+    # ======================================================
+    # ESTATÍSTICAS
+    # ======================================================
+
+    def atualizar_estatisticas(self, historico):
+
+        # Para os cards, queremos considerar o estado mais
+        # recente de cada URL, e não contar cada consulta
+        # histórica como um monitor diferente.
+
+        urls_recentes = {}
+
+        for verificacao in historico:
+
+            url = verificacao[1]
+
+            # O histórico já vem ordenado do mais recente
+            # para o mais antigo.
+            if url not in urls_recentes:
+
+                urls_recentes[url] = verificacao
+
+        total = len(
+            urls_recentes
+        )
+
+        online = 0
+        offline = 0
+
+        for verificacao in urls_recentes.values():
+
+            status = verificacao[3]
+
+            if status == "Online":
+                online += 1
+
+            else:
+                offline += 1
+
+        self.dashboard.card_monitorados.label_valor.setText(
+            str(total)
+        )
+
+        self.dashboard.card_online.label_valor.setText(
+            str(online)
+        )
+
+        self.dashboard.card_offline.label_valor.setText(
+            str(offline)
+        )
 
     # ======================================================
     # ANIMAÇÃO
@@ -1198,20 +1647,20 @@ class MainWindow(QMainWindow):
             self.dashboard
         )
 
+        self.dashboard.abrir_dashboard()
+
+        self.carregar_historico()
+
         self.animar_pagina(
             self.dashboard
         )
 
 
 # ==========================================================
-# ESTILO DA APLICAÇÃO
+# ESTILO
 # ==========================================================
 
 STYLE = """
-
-/* ========================================================
-   CONFIGURAÇÃO GERAL
-======================================================== */
 
 QWidget {
     background-color: #0b0f14;
@@ -1231,7 +1680,7 @@ QLabel {
 
 
 /* ========================================================
-   CARDS DE LOGIN E CADASTRO
+   AUTENTICAÇÃO
 ======================================================== */
 
 QFrame#authCard {
@@ -1242,14 +1691,7 @@ QFrame#authCard {
     border-radius: 14px;
 }
 
-
-/* ========================================================
-   TÍTULOS
-======================================================== */
-
 QLabel#authTitle {
-    background-color: transparent;
-
     color: #f8fafc;
 
     font-size: 28px;
@@ -1260,8 +1702,6 @@ QLabel#authTitle {
 }
 
 QLabel#authSubtitle {
-    background-color: transparent;
-
     color: #94a3b8;
 
     font-size: 13px;
@@ -1270,8 +1710,6 @@ QLabel#authSubtitle {
 }
 
 QLabel#fieldLabel {
-    background-color: transparent;
-
     color: #cbd5e1;
 
     font-size: 13px;
@@ -1283,7 +1721,7 @@ QLabel#fieldLabel {
 
 
 /* ========================================================
-   INPUTS
+   INPUT
 ======================================================== */
 
 QLineEdit {
@@ -1343,9 +1781,15 @@ QPushButton#primaryButton:pressed {
     background-color: #6248e8;
 }
 
+QPushButton#primaryButton:disabled {
+    background-color: #3d3566;
+
+    color: #aaa4c7;
+}
+
 
 /* ========================================================
-   BOTÃO EM FORMATO DE LINK
+   LINK
 ======================================================== */
 
 QPushButton#linkButton {
@@ -1421,7 +1865,7 @@ QPushButton#navButtonActive {
 
 
 /* ========================================================
-   SAIR
+   LOGOUT
 ======================================================== */
 
 QPushButton#logoutButton {
@@ -1469,7 +1913,7 @@ QLabel#sectionTitle {
 
 
 /* ========================================================
-   CARDS DE ESTATÍSTICA
+   CARDS
 ======================================================== */
 
 QFrame#statCard,
@@ -1497,7 +1941,7 @@ QLabel#statValue {
 
 
 /* ========================================================
-   TABELA
+   TABELAS
 ======================================================== */
 
 QTableWidget {

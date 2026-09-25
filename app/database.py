@@ -5,31 +5,49 @@ import psycopg2
 from dotenv import load_dotenv
 
 
-# Carrega as variáveis que estão no arquivo .env
+# ==========================================================
+# CONFIGURAÇÃO DO BANCO
+# ==========================================================
+
 load_dotenv()
 
-# Pega a URL do PostgreSQL que colocamos no .env
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Cria a conexão com o PostgreSQL do Supabase
+if not DATABASE_URL:
+    raise ValueError(
+        "DATABASE_URL não foi encontrada no arquivo .env."
+    )
+
 conection = psycopg2.connect(DATABASE_URL)
 
-# Cursor usado para executar comandos SQL
-cursor = conection.cursor()
 
+# ==========================================================
+# CADASTRO
+# ==========================================================
 
 def cadastrar_usuario(email, senha):
+
+    email = email.strip().lower()
 
     if not email or not senha:
         return "Preencha os dados primeiro!"
 
-    senha_hash = hashlib.sha256(senha.encode()).hexdigest()
+    senha_hash = hashlib.sha256(
+        senha.encode()
+    ).hexdigest()
+
+    cursor = conection.cursor()
 
     try:
         cursor.execute(
-            '''INSERT INTO usuarios (email, senha_hash)
-               VALUES (%s, %s)''',
-            (email, senha_hash)
+            """
+            INSERT INTO usuarios (email, senha_hash)
+            VALUES (%s, %s)
+            """,
+            (
+                email,
+                senha_hash
+            )
         )
 
         conection.commit()
@@ -42,57 +60,129 @@ def cadastrar_usuario(email, senha):
 
         return "E-mail já cadastrado."
 
+    except Exception:
+        conection.rollback()
+        raise
+
+    finally:
+        cursor.close()
+
+
+# ==========================================================
+# LOGIN
+# ==========================================================
 
 def fazer_login(email_digitado, senha_digitada):
 
-    cursor.execute(
-        '''SELECT senha_hash
-           FROM usuarios
-           WHERE email = %s''',
-        (email_digitado,)
-    )
+    email_digitado = email_digitado.strip().lower()
 
-    resultado = cursor.fetchone()
+    cursor = conection.cursor()
 
-    if resultado is None:
-        return "E-mail ou senha incorretos."
-
-    senha_hash_digitada = hashlib.sha256(
-        senha_digitada.encode()
-    ).hexdigest()
-
-    senha_hash_banco = resultado[0]
-
-    if senha_hash_digitada == senha_hash_banco:
-        return "Login realizado com sucesso!"
-
-    return "E-mail ou senha incorretos."
-
-
-def salvar_verificacao(resultado):
-
-    cursor.execute(
-        '''INSERT INTO verificacoes
-           (url, status_code, status, response_time)
-           VALUES (%s, %s, %s, %s)''',
-        (
-            resultado["url"],
-            resultado["status_code"],
-            resultado["status"],
-            resultado["response_time"]
+    try:
+        cursor.execute(
+            """
+            SELECT id, senha_hash
+            FROM usuarios
+            WHERE email = %s
+            """,
+            (
+                email_digitado,
+            )
         )
-    )
 
-    conection.commit()
+        resultado = cursor.fetchone()
+
+        if resultado is None:
+            return None
+
+        usuario_id = resultado[0]
+        senha_hash_banco = resultado[1]
+
+        senha_hash_digitada = hashlib.sha256(
+            senha_digitada.encode()
+        ).hexdigest()
+
+        if senha_hash_digitada == senha_hash_banco:
+
+            return {
+                "id": usuario_id,
+                "email": email_digitado
+            }
+
+        return None
+
+    finally:
+        cursor.close()
 
 
-def buscar_historico():
+# ==========================================================
+# SALVAR VERIFICAÇÃO
+# ==========================================================
 
-    cursor.execute(
-        '''SELECT *
-           FROM verificacoes'''
-    )
+def salvar_verificacao(resultado, usuario_id):
 
-    resultados = cursor.fetchall()
+    cursor = conection.cursor()
 
-    return resultados
+    try:
+        cursor.execute(
+            """
+            INSERT INTO verificacoes
+            (
+                usuario_id,
+                url,
+                status_code,
+                status,
+                response_time
+            )
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (
+                usuario_id,
+                resultado["url"],
+                resultado["status_code"],
+                resultado["status"],
+                resultado["response_time"]
+            )
+        )
+
+        conection.commit()
+
+    except Exception:
+        conection.rollback()
+        raise
+
+    finally:
+        cursor.close()
+
+
+# ==========================================================
+# HISTÓRICO DO USUÁRIO
+# ==========================================================
+
+def buscar_historico(usuario_id):
+
+    cursor = conection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            SELECT
+                id,
+                url,
+                status_code,
+                status,
+                response_time,
+                created_at
+            FROM verificacoes
+            WHERE usuario_id = %s
+            ORDER BY created_at DESC
+            """,
+            (
+                usuario_id,
+            )
+        )
+
+        return cursor.fetchall()
+
+    finally:
+        cursor.close()
